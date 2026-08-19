@@ -1,4 +1,15 @@
-# SYS-304 Milestone 1: Disaster Tweet Classification
+# SYS-304: Scalable Algorithms and Infrastructure
+
+**Milestone 1** lives here: [`milestone/1/`](milestone/1/)
+
+| Path | Contents |
+| --- | --- |
+| [`milestone/1/README.md`](milestone/1/README.md) | Milestone 1 index |
+| [`milestone/1/eda_and_baseline.ipynb`](milestone/1/eda_and_baseline.ipynb) | EDA, training, metrics |
+| [`milestone/1/models/`](milestone/1/models/) | Saved baseline weights |
+| [`milestone/1/data/`](milestone/1/data/) | Train/test CSVs |
+
+# Milestone 1: Disaster Tweet Classification
 
 **Course:** SYS-304 Scalable Algorithms and Infrastructure  
 **Domain:** NLP / binary text classification  
