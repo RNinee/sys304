@@ -1,0 +1,15 @@
+torch
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+transformers
+peft
+datasets
+accelerate
+evaluate
+jupyter
+ipykernel
+huggingface_hub
+joblib

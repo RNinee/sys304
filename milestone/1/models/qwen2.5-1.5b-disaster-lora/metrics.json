@@ -1,0 +1,8 @@
+{
+  "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+  "val_f1_disaster": 0.816260162601626,
+  "val_f1_weighted": 0.8500903943339057,
+  "tfidf_f1_disaster": 0.7773527161438408,
+  "n_train": 6090,
+  "n_val": 1523
+}
