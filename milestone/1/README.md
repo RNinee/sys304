@@ -13,8 +13,7 @@ Binary **disaster vs not-disaster** tweet classification on
 | [main.py](main.py) | Kaggle download into `data/` |
 | [data/](data/) | `train.csv`, `test.csv`, `sample_submission.csv` |
 | [models/qwen2.5-1.5b-disaster-lora/](models/qwen2.5-1.5b-disaster-lora/) | Saved Qwen 1.5B LoRA weights |
-| [models/tfidf_logreg.joblib](models/tfidf_logreg.joblib) | Sklearn baseline |
 
-Validation: **85.2% accuracy**, F1 (disaster) **0.816** (Qwen LoRA) vs 81% / 0.777 (TF-IDF).
+Validation: **85.2% accuracy**, F1 (disaster) **0.816**.
 
 Course-level writeup: [../../README.md](../../README.md)

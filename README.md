@@ -40,20 +40,13 @@ python milestone/1/main.py
 Notebook: [`milestone/1/eda_and_baseline.ipynb`](milestone/1/eda_and_baseline.ipynb)
 
 1. EDA: class balance, missing values, keyword rates, text length, duplicates.
-2. Classical baseline: TF-IDF + logistic regression.
-3. Naive LM baseline: **Qwen2.5-1.5B-Instruct** (1.5B, Apache-2.0) with LoRA sequence classification. One epoch, no hyperparameter search.
+2. Naive LM baseline: **Qwen2.5-1.5B-Instruct** (1.5B, Apache-2.0) with LoRA sequence classification. One epoch, no hyperparameter search.
 
-Validation (1,523 tweets, 80/20 stratified split):
-
-| Model | Accuracy | F1 (disaster) |
-| --- | ---: | ---: |
-| TF-IDF + logreg | 81% | 0.777 |
-| Qwen2.5-1.5B LoRA | **85.2%** | **0.816** |
+Validation (1,523 tweets, 80/20 stratified split): **85.2% accuracy**, F1 (disaster) **0.816**.
 
 ## Saved weights
 
 - LM adapters: `milestone/1/models/qwen2.5-1.5b-disaster-lora/` (`adapter_model.safetensors`)
-- Sklearn baseline: `milestone/1/models/tfidf_logreg.joblib`
 
 The 1.5B base weights stay in the Hugging Face cache. Reload the LoRA adapter from the notebook’s last section (skip retraining for the demo video).
 
