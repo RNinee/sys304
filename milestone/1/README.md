@@ -10,6 +10,7 @@ Binary **disaster vs not-disaster** tweet classification on
 | File | What it is |
 | --- | --- |
 | [eda_and_baseline.ipynb](eda_and_baseline.ipynb) | EDA, data pipeline, training, evaluation |
+| [demo_predictions.ipynb](demo_predictions.ipynb) | Load saved weights and run predictions (Canvas video) |
 | [main.py](main.py) | Kaggle download into `data/` |
 | [data/](data/) | `train.csv`, `test.csv`, `sample_submission.csv` |
 | [models/qwen2.5-1.5b-disaster-lora/](models/qwen2.5-1.5b-disaster-lora/) | Saved Qwen 1.5B LoRA weights |

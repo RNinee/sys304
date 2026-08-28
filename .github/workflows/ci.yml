@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: milestone/2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        run: pip install -r backend/python/requirements-dev.txt
+
+      - name: Install backend JS deps
+        run: bun install --frozen-lockfile
+        working-directory: milestone/2/backend
+
+      - name: Install frontend JS deps
+        run: bun install --frozen-lockfile
+        working-directory: milestone/2/frontend
+
+      - name: Ruff
+        run: ruff check infer.py test_infer.py
+        working-directory: milestone/2/backend/python
+
+      - name: Biome
+        run: bunx biome check src tests
+        working-directory: milestone/2/backend
+
+      - name: ESLint
+        run: bunx eslint .
+        working-directory: milestone/2/frontend
+
+      - name: Python unit tests
+        run: pytest -q
+        working-directory: milestone/2/backend/python
+
+      - name: Backend unit + API integration tests
+        run: bun test
+        working-directory: milestone/2/backend
+        env:
+          PYTHON: python3
+
+      - name: Frontend unit tests
+        run: bun test src
+        working-directory: milestone/2/frontend
+
+      - name: Install Playwright browser
+        run: bunx playwright install --with-deps chromium
+        working-directory: milestone/2/frontend
+
+      - name: UI integration tests
+        run: bun run test:e2e
+        working-directory: milestone/2/frontend

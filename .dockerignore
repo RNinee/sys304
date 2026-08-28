@@ -1,0 +1,11 @@
+.git
+.venv/
+.venv-ml/
+**/node_modules
+**/.next
+**/__pycache__
+**/.ipynb_checkpoints
+milestone/1/data
+milestone/1/*.ipynb
+milestone/1/models/qwen-runs
+graphify-out

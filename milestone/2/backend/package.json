@@ -1,0 +1,21 @@
+{
+  "name": "disaster-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "test": "bun test tests",
+    "lint": "biome check src tests",
+    "lint:fix": "biome check --write src tests"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^1.4.2",
+    "elysia": "^1.4.30"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.11",
+    "bun-types": "^1.4.0"
+  }
+}

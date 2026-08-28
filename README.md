@@ -1,13 +1,14 @@
 # SYS-304: Scalable Algorithms and Infrastructure
 
-**Milestone 1** lives here: [`milestone/1/`](milestone/1/)
+| Milestone | Folder | Status |
+| --- | --- | --- |
+| 1 · Problem scoping & prototype | [`milestone/1/`](milestone/1/) | complete |
+| 2 · Model service, UI, Docker, CI | [`milestone/2/`](milestone/2/) | in progress |
 
-| Path | Contents |
-| --- | --- |
-| [`milestone/1/README.md`](milestone/1/README.md) | Milestone 1 index |
-| [`milestone/1/eda_and_baseline.ipynb`](milestone/1/eda_and_baseline.ipynb) | EDA, training, metrics |
-| [`milestone/1/models/`](milestone/1/models/) | Saved baseline weights |
-| [`milestone/1/data/`](milestone/1/data/) | Train/test CSVs |
+```bash
+./deploy.sh local     # UI http://localhost:3000  API http://localhost:8000
+./deploy.sh           # docker compose
+```
 
 # Milestone 1: Disaster Tweet Classification
 
@@ -48,7 +49,7 @@ Validation (1,523 tweets, 80/20 stratified split): **85.2% accuracy**, F1 (disas
 
 - LM adapters: `milestone/1/models/qwen2.5-1.5b-disaster-lora/` (`adapter_model.safetensors`)
 
-The 1.5B base weights stay in the Hugging Face cache. Reload the LoRA adapter from the notebook’s last section (skip retraining for the demo video).
+The 1.5B base weights stay in the Hugging Face cache. For the Canvas screen recording, run [`milestone/1/demo_predictions.ipynb`](milestone/1/demo_predictions.ipynb) (loads the adapter, no training).
 
 ## Setup
 
