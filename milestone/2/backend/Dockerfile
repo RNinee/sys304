@@ -9,13 +9,14 @@ WORKDIR /app
 COPY milestone/2/backend/package.json milestone/2/backend/bun.lock ./
 RUN bun install --frozen-lockfile --production
 
-COPY milestone/2/backend/src ./src
-COPY milestone/2/backend/python ./python
-COPY milestone/1/models/qwen2.5-1.5b-disaster-lora /models/qwen2.5-1.5b-disaster-lora
-
+COPY milestone/2/backend/python/requirements.txt ./python/requirements.txt
 RUN pip3 install --break-system-packages --no-cache-dir \
     torch --index-url https://download.pytorch.org/whl/cpu \
   && pip3 install --break-system-packages --no-cache-dir -r python/requirements.txt
+
+COPY milestone/2/backend/src ./src
+COPY milestone/2/backend/python ./python
+COPY milestone/1/models/qwen2.5-1.5b-disaster-lora /models/qwen2.5-1.5b-disaster-lora
 
 ENV QWEN_ADAPTER_DIR=/models/qwen2.5-1.5b-disaster-lora \
     PYTHON=python3 \

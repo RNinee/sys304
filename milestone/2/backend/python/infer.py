@@ -14,10 +14,10 @@ from urllib.parse import urlparse
 
 def _repo_root() -> Path:
     start = Path(__file__).resolve()
-    for path in [start, *start.parents]:
+    for path in start.parents:
         if (path / "milestone" / "1" / "models").is_dir():
             return path
-    return start.parents[4]
+    return start.parent
 
 
 REPO_ROOT = _repo_root()
