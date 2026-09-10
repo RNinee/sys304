@@ -3,11 +3,12 @@
 | Milestone | Folder | Status |
 | --- | --- | --- |
 | 1 · Problem scoping & prototype | [`milestone/1/`](milestone/1/) | complete |
-| 2 · Model service, UI, Docker, CI | [`milestone/2/`](milestone/2/) | in progress |
+| 2 · Model service, UI, Docker, CI | [`milestone/2/`](milestone/2/) | complete |
+| 3 · Scaling & optimization | [`milestone/3/`](milestone/3/) | in progress |
 
 ```bash
-./deploy.sh local     # UI http://localhost:3000  API http://localhost:8000
-./deploy.sh           # docker compose
+./deploy.sh local                 # Milestone 2  UI :3000  API :8000
+./milestone/3/deploy.sh local     # Milestone 3  + Redis, batching, quantized model
 ```
 
 # Milestone 1: Disaster Tweet Classification

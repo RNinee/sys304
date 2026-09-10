@@ -5,7 +5,13 @@ __pycache__/
 .DS_Store
 .vscode/
 milestone/1/models/qwen-runs/
+.pytest_cache/
+.ruff_cache/
 graphify-out/
+milestone/3/models/distilbert-student/
+milestone/3/models/distilbert-student-onnx/
+milestone/3/benchmarks/results/*.json
+milestone/3/benchmarks/results/*.md
 node_modules/
 .next/
 playwright-report/

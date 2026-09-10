@@ -1,0 +1,8 @@
+{
+  "n": 3263,
+  "disaster_rate": 0.37205026049647566,
+  "path": "/Users/nine/Desktop/CMKL/3.1/sys304/milestone/3/data/submission.csv",
+  "model": "distilbert-student",
+  "agreement_with_qwen_submission": 0.9123505976095617,
+  "qwen_disaster_rate": 0.3683726631933803
+}

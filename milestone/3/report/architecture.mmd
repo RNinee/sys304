@@ -1,0 +1,28 @@
+flowchart TB
+  UI["Next.js + assistant-ui"]
+  Bench["bench.py / bench_api.ts"]
+
+  subgraph api ["Bun + Elysia API"]
+    Predict["POST /predict"]
+    Cache{"Redis GET"}
+    Hit["Return cached: true"]
+    Batcher["Dynamic batcher\nmax 8 requests / 15 ms"]
+    Predict --> Cache
+    Cache -->|"hit"| Hit
+    Cache -->|"miss"| Batcher
+  end
+
+  Redis[("Redis\nexact-match TTL")]
+  Cache -.-> Redis
+
+  subgraph worker ["Python infer worker"]
+    BatchEP["POST /predict_batch"]
+    Model["ONNX Runtime CPU\nDistilBERT student"]
+    BatchEP --> Model
+  end
+
+  UI --> Predict
+  Bench --> Predict
+  Batcher -->|"JSON batch"| BatchEP
+  Model -->|"SET result"| Redis
+  Model --> Miss["Return cached: false\n+ batch_size"]

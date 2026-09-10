@@ -1,0 +1,1 @@
+# Ignore trained student / ONNX artifacts (regenerate with distill.py / export_onnx.py)

@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Launch the Milestone 3 optimized stack.
+#   ./deploy.sh          docker compose (frontend :3000, API :8000, Redis :6379)
+#   ./deploy.sh local    bun + python on the host, Redis via docker
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+REPO="$(cd "$ROOT/../.." && pwd)"
+MODE="${1:-docker}"
+
+if [[ "$MODE" == "local" ]]; then
+  PYTHON="${PYTHON:-}"
+  if [[ -z "$PYTHON" && -x "$REPO/.venv-ml/bin/python" ]]; then
+    PYTHON="$REPO/.venv-ml/bin/python"
+  elif [[ -z "$PYTHON" ]]; then
+    PYTHON="python3"
+  fi
+
+  if ! "$PYTHON" -c "import torch, transformers, peft, numpy" >/dev/null 2>&1; then
+    echo "Installing Python inference deps with $PYTHON ..."
+    "$PYTHON" -m pip install torch
+    "$PYTHON" -m pip install -r "$ROOT/backend/python/requirements.txt"
+  fi
+
+  if [[ ! -f "$ROOT/backend/node_modules/elysia/package.json" ]]; then
+    (cd "$ROOT/backend" && bun install)
+  fi
+  if [[ ! -f "$REPO/milestone/2/frontend/node_modules/next/package.json" ]]; then
+    (cd "$REPO/milestone/2/frontend" && bun install)
+  fi
+
+  if command -v docker >/dev/null 2>&1; then
+    (cd "$ROOT" && docker compose up -d redis)
+    export REDIS_URL="${REDIS_URL:-redis://127.0.0.1:6379}"
+  else
+    echo "docker not found — starting without Redis cache" >&2
+  fi
+
+  cleanup() {
+    trap - INT TERM EXIT
+    [[ -n "${API_PID:-}" ]] && kill "$API_PID" 2>/dev/null || true
+    wait 2>/dev/null || true
+  }
+  trap cleanup INT TERM EXIT
+
+  echo "API  http://localhost:8000"
+  echo "UI   http://localhost:3000"
+  echo "Redis ${REDIS_URL:-off}"
+  echo "POST /predict — quantized Qwen + dynamic batching + cache"
+  echo
+
+  (
+    cd "$ROOT/backend"
+    PYTHON="$PYTHON" \
+      INFER_BACKEND="${INFER_BACKEND:-auto}" \
+      BATCH_MAX_SIZE="${BATCH_MAX_SIZE:-8}" \
+      BATCH_MAX_WAIT_MS="${BATCH_MAX_WAIT_MS:-15}" \
+      bun run src/index.ts
+  ) &
+  API_PID=$!
+
+  ready=0
+  for _ in $(seq 1 180); do
+    if curl -sf http://127.0.0.1:8000/health >/dev/null; then
+      ready=1
+      break
+    fi
+    sleep 1
+  done
+  if [[ "$ready" -ne 1 ]]; then
+    echo "API did not become healthy on :8000" >&2
+    exit 1
+  fi
+
+  cd "$REPO/milestone/2/frontend"
+  bun run dev
+  exit 0
+fi
+
+if [[ "$MODE" != "docker" ]]; then
+  echo "Usage: $0 [docker|local]" >&2
+  exit 1
+fi
+
+cd "$ROOT"
+docker compose up --build
