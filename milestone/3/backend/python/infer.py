@@ -244,13 +244,14 @@ class OnnxPredictor:
             padding=True,
             return_tensors="np",
         )
-        logits = self.session.run(
+        output = self.session.run(
             None,
             {
                 "input_ids": enc["input_ids"].astype(np.int64),
                 "attention_mask": enc["attention_mask"].astype(np.int64),
             },
         )[0]
+        logits = np.asarray(output)
         proba = _softmax(logits)
         targets = np.argmax(proba, axis=-1).tolist()
         return [
@@ -313,8 +314,8 @@ def _optimizations(pred) -> list[str]:
 
 
 class Handler(BaseHTTPRequestHandler):
-    def log_message(self, fmt: str, *args: Any) -> None:
-        sys.stderr.write(f"{self.address_string()} - {fmt % args}\n")
+    def log_message(self, format: str, *args: Any) -> None:
+        sys.stderr.write(f"{self.address_string()} - {format % args}\n")
 
     def _send(self, code: int, payload: dict[str, Any]) -> None:
         body = json.dumps(payload).encode("utf-8")

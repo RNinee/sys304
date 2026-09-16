@@ -17,6 +17,7 @@ import json
 import os
 import sys
 import time
+from contextlib import suppress
 from pathlib import Path
 from statistics import mean, quantiles
 
@@ -52,7 +53,7 @@ def percentile(values: list[float], p: float) -> float:
         return float(pts[idx])
     except (ValueError, IndexError):
         ordered = sorted(values)
-        k = int(round((p / 100) * (len(ordered) - 1)))
+        k = round((p / 100) * (len(ordered) - 1))
         return float(ordered[k])
 
 
@@ -62,7 +63,7 @@ def load_tweets() -> list[dict]:
 
 def bench_backend(backend: str, tweets: list[dict], repeats: int) -> dict:
     os.environ["INFER_BACKEND"] = backend
-    from infer import load_predictor  # noqa: PLC0415
+    from infer import load_predictor
 
     t_load = time.perf_counter()
     pred = load_predictor()
@@ -101,15 +102,13 @@ def bench_backend(backend: str, tweets: list[dict], repeats: int) -> dict:
     }
     del pred
     gc.collect()
-    try:
+    with suppress(Exception):
         import torch
 
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         if torch.backends.mps.is_available():
             torch.mps.empty_cache()
-    except Exception:  # noqa: BLE001
-        pass
     return row
 
 

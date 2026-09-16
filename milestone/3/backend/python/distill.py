@@ -15,6 +15,7 @@ import gc
 import json
 import sys
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -76,9 +77,17 @@ class TweetDataset(Dataset):
         return item
 
 
+def _missing_keyword(keyword: object) -> bool:
+    if keyword is None or keyword is pd.NA:
+        return True
+    if isinstance(keyword, (float, np.floating)) and np.isnan(keyword):
+        return True
+    return False
+
+
 def format_row(text: str, keyword: object) -> str:
     body = str(text).strip()
-    kw = "" if pd.isna(keyword) else str(keyword).strip()
+    kw = "" if _missing_keyword(keyword) else str(keyword).strip()
     if not kw:
         return body
     return f"keyword: {kw}\n{body}"
@@ -155,10 +164,13 @@ def main() -> None:
     args = parser.parse_args()
 
     df = pd.read_csv(TRAIN_CSV)
-    texts = [format_row(t, k) for t, k in zip(df["text"], df["keyword"], strict=True)]
-    labels = df["target"].astype(int).tolist()
-    x_train, x_val, y_train, y_val = train_test_split(
-        texts, labels, test_size=0.2, random_state=42, stratify=labels
+    texts: list[str] = [
+        format_row(t, k) for t, k in zip(df["text"], df["keyword"], strict=True)
+    ]
+    labels: list[int] = [int(x) for x in df["target"].tolist()]
+    x_train, x_val, y_train, y_val = cast(
+        tuple[list[str], list[str], list[int], list[int]],
+        train_test_split(texts, labels, test_size=0.2, random_state=42, stratify=labels),
     )
 
     if torch.backends.mps.is_available():

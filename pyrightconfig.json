@@ -1,4 +1,11 @@
 {
   "venvPath": ".",
-  "venv": ".venv-ml"
+  "venv": ".venv-ml",
+  "reportPrivateImportUsage": "none",
+  "executionEnvironments": [
+    {
+      "root": "milestone/3/benchmarks",
+      "extraPaths": ["milestone/3/backend/python"]
+    }
+  ]
 }

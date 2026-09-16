@@ -12,7 +12,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend" / "python"))
 
-from infer import StudentPredictor  # noqa: E402
+from infer import StudentPredictor
 
 TEST_CSV = ROOT.parent / "1" / "data" / "test.csv"
 TEACHER_SUB = ROOT.parent / "1" / "data" / "submission.csv"
@@ -42,17 +42,19 @@ def main() -> None:
     sub.to_csv(out_path, index=False)
 
     summary = {
-        "n": int(len(sub)),
-        "disaster_rate": float(sub["target"].mean()),
+        "n": len(sub),
+        "disaster_rate": float(sub["target"].to_numpy(dtype=float).mean()),
         "path": str(out_path),
         "model": pred.name,
     }
     if TEACHER_SUB.exists():
         teacher = pd.read_csv(TEACHER_SUB)
         merged = sub.merge(teacher, on="id", suffixes=("_student", "_qwen"))
-        agree = float((merged["target_student"] == merged["target_qwen"]).mean())
+        agree = float(
+            (merged["target_student"] == merged["target_qwen"]).to_numpy(dtype=bool).mean()
+        )
         summary["agreement_with_qwen_submission"] = agree
-        summary["qwen_disaster_rate"] = float(teacher["target"].mean())
+        summary["qwen_disaster_rate"] = float(teacher["target"].to_numpy(dtype=float).mean())
     (OUT_DIR / "submission_meta.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary, indent=2))
     print("upload", out_path, "to https://www.kaggle.com/competitions/nlp-getting-started")

@@ -133,8 +133,8 @@ def get_predictor() -> QwenPredictor:
 
 
 class Handler(BaseHTTPRequestHandler):
-    def log_message(self, fmt: str, *args: Any) -> None:
-        sys.stderr.write(f"{self.address_string()} - {fmt % args}\n")
+    def log_message(self, format: str, *args: Any) -> None:
+        sys.stderr.write(f"{self.address_string()} - {format % args}\n")
 
     def _send(self, code: int, payload: dict[str, Any]) -> None:
         body = json.dumps(payload).encode("utf-8")
