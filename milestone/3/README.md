@@ -2,7 +2,15 @@
 
 SYS-304 · due Sep 25, 2026
 
-Phase 2 served the **Qwen2.5-1.5B LoRA** classifier as a single FP32 worker. Phase 3 keeps that contract (`POST /predict`) and adds **model-level** and **infrastructure-level** optimizations so the same UI can take concurrent traffic without blocking on one slow forward pass.
+The three milestones are one stack. Each version keeps the previous contract and adds a layer:
+
+| Version | Adds | Lives in |
+| --- | --- | --- |
+| **v1** | Qwen2.5-1.5B LoRA classifier | `milestone/1/models/qwen2.5-1.5b-disaster-lora/` (loaded by the infer worker) |
+| **v2** | Bun/Elysia API + assistant-ui chat | `backend/` and `frontend/` in this folder |
+| **v3** | Quantization, distillation, ONNX, dynamic batching, Redis | the same `backend/`, plus `benchmarks/` |
+
+v2 served that classifier as a single FP32 worker. v3 keeps `POST /predict` and the chat UI, and adds **model-level** and **infrastructure-level** optimizations so the same UI can take concurrent traffic without blocking on one slow forward pass.
 
 ## Run
 
@@ -86,13 +94,14 @@ Same as Milestone 2, plus:
 | `GET /metrics` | Cache hits/misses, batch counts |
 | `GET /health` | `cache`, `optimizations`, `infer` |
 
-The Milestone 2 assistant-ui frontend is reused (`milestone/2/frontend`) so the chat contract does not change.
+The chat UI is `frontend/` (the v2 assistant-ui app, now in this folder). The request shape is unchanged.
 
 ## Tests
 
 ```bash
 cd milestone/3/backend && bun test && bun run lint
 cd python && ruff check infer.py distill.py export_onnx.py test_infer.py && pytest -q
+cd milestone/3/frontend && bun test && bun run lint
 ```
 
 ## Report

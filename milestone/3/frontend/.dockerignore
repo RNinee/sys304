@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+e2e
+*.md
+*.test.ts
+*.spec.ts
+playwright.config.ts
+playwright-report
+test-results

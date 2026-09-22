@@ -67,7 +67,7 @@ Drawn with Mermaid.js (`architecture.mmd`). The diagram is that figure rendered 
 
 ```mermaid
 flowchart TB
-  UI["Next.js + assistant-ui"]
+  UI["Next.js + assistant-ui\n(v2 chat UI)"]
   Bench["bench.py / bench_api.ts"]
 
   subgraph api ["Bun + Elysia API"]
@@ -220,4 +220,4 @@ bun run milestone/3/benchmarks/bench_api.ts --url http://127.0.0.1:8010 --concur
 
 Kaggle: `milestone/3/data/submission.csv` (public F1 **0.83450**, tied with Phase 1 Qwen). Hard-label-only DistilBERT scored **0.82592**.  
 Raw dumps: `milestone/3/benchmarks/results/latest.json`, `api-latest.json`.  
-Code: `milestone/3/`. Phase 2 remains at `milestone/2/` as the naive baseline.
+Code: `milestone/3/`. The Phase 2 API and assistant-ui chat live in this folder (`backend/`, `frontend/`); Phase 3 extends them. The untouched Phase 2 tree remains at `milestone/2/` as the naive baseline.

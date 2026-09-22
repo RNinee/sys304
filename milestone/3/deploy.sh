@@ -25,8 +25,8 @@ if [[ "$MODE" == "local" ]]; then
   if [[ ! -f "$ROOT/backend/node_modules/elysia/package.json" ]]; then
     (cd "$ROOT/backend" && bun install)
   fi
-  if [[ ! -f "$REPO/milestone/2/frontend/node_modules/next/package.json" ]]; then
-    (cd "$REPO/milestone/2/frontend" && bun install)
+  if [[ ! -f "$ROOT/frontend/node_modules/next/package.json" ]]; then
+    (cd "$ROOT/frontend" && bun install)
   fi
 
   if command -v docker >/dev/null 2>&1; then
@@ -72,7 +72,7 @@ if [[ "$MODE" == "local" ]]; then
     exit 1
   fi
 
-  cd "$REPO/milestone/2/frontend"
+  cd "$ROOT/frontend"
   bun run dev
   exit 0
 fi
