@@ -11,9 +11,20 @@ export type InferFn = (
   options?: { signal?: AbortSignal },
 ) => Promise<PredictResponse>;
 
+export type LoggedRequest = {
+  route: "/predict" | "/chat";
+  status: number;
+  latencyMs: number;
+  text: string;
+  keyword?: string;
+  result?: PredictResponse;
+  error?: string;
+};
+
 export type AppOptions = {
   infer?: InferFn;
   cache?: PredictCache;
+  onLogged?: (event: LoggedRequest) => void;
 };
 
 export function createApp(inferOrOptions?: InferFn | AppOptions) {
@@ -23,6 +34,34 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
       : (inferOrOptions ?? {});
   const infer = options.infer;
   const cache = options.cache ?? noopCache;
+
+  const emit = (
+    route: LoggedRequest["route"],
+    started: number,
+    status: number,
+    fields: {
+      text?: string;
+      keyword?: string;
+      result?: PredictResponse;
+      error?: string;
+    },
+  ) => {
+    if (!options.onLogged) return;
+    try {
+      const event: LoggedRequest = {
+        route,
+        status,
+        latencyMs: performance.now() - started,
+        text: fields.text ?? "",
+      };
+      if (fields.keyword) event.keyword = fields.keyword;
+      if (fields.result) event.result = fields.result;
+      if (fields.error) event.error = fields.error;
+      options.onLogged(event);
+    } catch (error) {
+      console.error("[log] failed:", error);
+    }
+  };
 
   return new Elysia()
     .use(
@@ -59,16 +98,23 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
       cache: cache.status,
     }))
     .post("/predict", async ({ request, set }) => {
+      const started = performance.now();
       let raw: unknown;
       try {
         raw = await request.json();
       } catch {
         set.status = 400;
+        emit("/predict", started, 400, { error: "invalid JSON" });
         return { error: "invalid JSON" };
       }
       const parsed = validatePredictBody(raw);
       if (!parsed.ok) {
         set.status = 400;
+        const text =
+          raw && typeof raw === "object" && "text" in raw
+            ? String((raw as { text?: unknown }).text ?? "")
+            : "";
+        emit("/predict", started, 400, { text, error: parsed.error });
         return { error: parsed.error };
       }
       const body: PredictRequest = parsed.keyword
@@ -82,6 +128,11 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
           console.log(
             `[predict] cache hit ${JSON.stringify(body.text.slice(0, 80))} -> ${result.label}`,
           );
+          emit("/predict", started, 200, {
+            text: body.text,
+            keyword: body.keyword,
+            result,
+          });
           return result;
         }
         stats.cacheMisses += 1;
@@ -93,20 +144,33 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
         console.log(
           `[predict] ${JSON.stringify(body.text.slice(0, 80))} -> ${result.label} (${result.confidence.toFixed(3)}) [${result.model}] batch=${result.batch_size ?? 1}`,
         );
-        return { ...result, cached: false };
+        const response = { ...result, cached: false };
+        emit("/predict", started, 200, {
+          text: body.text,
+          keyword: body.keyword,
+          result: response,
+        });
+        return response;
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error("[predict] failed:", message);
         set.status = 503;
+        emit("/predict", started, 503, {
+          text: body.text,
+          keyword: body.keyword,
+          error: message,
+        });
         return { error: message };
       }
     })
     .post("/chat", async ({ request, set }) => {
+      const started = performance.now();
       let raw: unknown;
       try {
         raw = await request.json();
       } catch {
         set.status = 400;
+        emit("/chat", started, 400, { error: "invalid JSON" });
         return { error: "invalid JSON" };
       }
       const messages = (
@@ -114,6 +178,7 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
       ).messages;
       if (!Array.isArray(messages) || messages.length === 0) {
         set.status = 400;
+        emit("/chat", started, 400, { error: "messages array required" });
         return { error: "messages array required" };
       }
       const lastUser = [...messages].reverse().find((m) => m.role === "user");
@@ -121,6 +186,7 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
       const parsed = validatePredictBody({ text });
       if (!parsed.ok) {
         set.status = 400;
+        emit("/chat", started, 400, { text, error: parsed.error });
         return { error: parsed.error };
       }
       const body: PredictRequest = parsed.keyword
@@ -146,6 +212,11 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
         console.log(
           `[chat] ${JSON.stringify(parsed.text.slice(0, 80))} -> ${result.label} (${result.confidence.toFixed(3)})${result.cached ? " cached" : ""}`,
         );
+        emit("/chat", started, 200, {
+          text: body.text,
+          keyword: body.keyword,
+          result,
+        });
         return {
           text: formatAssistantReply(result),
           prediction: result,
@@ -154,6 +225,11 @@ export function createApp(inferOrOptions?: InferFn | AppOptions) {
         const message = error instanceof Error ? error.message : String(error);
         console.error("[chat] failed:", message);
         set.status = 503;
+        emit("/chat", started, 503, {
+          text: body.text,
+          keyword: body.keyword,
+          error: message,
+        });
         return { error: message };
       }
     });

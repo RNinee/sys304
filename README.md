@@ -4,11 +4,13 @@
 | --- | --- | --- |
 | 1 · Problem scoping & prototype | [`milestone/1/`](milestone/1/) | complete |
 | 2 · Model service, UI, Docker, CI | [`milestone/2/`](milestone/2/) | complete |
-| 3 · Scaling & optimization | [`milestone/3/`](milestone/3/) | in progress |
+| 3 · Scaling & optimization | [`milestone/3/`](milestone/3/) | complete |
+| 4 · Observability & retraining | [`milestone/4/`](milestone/4/) | in progress |
 
 ```bash
 ./deploy.sh local                 # Milestone 2  UI :3000  API :8000
 ./milestone/3/deploy.sh local     # Milestone 3  + Redis, batching, quantized model
+./milestone/4/deploy.sh local     # Milestone 4  + SQLite log, Prometheus, Grafana
 ```
 
 # Milestone 1: Disaster Tweet Classification

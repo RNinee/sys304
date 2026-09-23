@@ -1,0 +1,35 @@
+flowchart TB
+  UI["Next.js chat"]
+  Work["workload.ts"]
+
+  subgraph api ["Bun API"]
+    Predict["POST /predict"]
+    Log["SQLite request log"]
+    Prom["GET /prometheus"]
+    Predict --> Log
+    Log --> Prom
+  end
+
+  UI --> Predict
+  Work --> Predict
+
+  subgraph observe ["Docker Compose"]
+    Prometheus["Prometheus"]
+    Grafana["Grafana"]
+    Prometheus --> Grafana
+  end
+
+  Prom --> Prometheus
+
+  subgraph retrain ["retrain.py"]
+    Trigger{"time elapsed\nor confidence drop"}
+    Train["Fine-tune DistilBERT"]
+    Eval{"new F1 greater\nthan live F1"}
+    Swap["Replace student + ONNX"]
+    Reload["POST /admin/reload"]
+    Trigger --> Train --> Eval
+    Eval -->|yes| Swap --> Reload
+  end
+
+  Log --> Trigger
+  Reload --> Predict

@@ -118,3 +118,36 @@ jobs:
       - name: Frontend unit tests
         run: bun test src
         working-directory: milestone/3/frontend
+
+  milestone-4:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Milestone 3 API deps
+        run: bun install --frozen-lockfile
+        working-directory: milestone/3/backend
+
+      - name: Install Milestone 4 deps
+        run: bun install --frozen-lockfile
+        working-directory: milestone/4
+
+      - name: Biome
+        run: bunx biome check src tests scripts
+        working-directory: milestone/4
+
+      - name: Monitor tests
+        run: bun test ./tests
+        working-directory: milestone/4
+
+      - name: Retrain trigger tests
+        run: python -m unittest discover -s python -p 'test_*.py'
+        working-directory: milestone/4

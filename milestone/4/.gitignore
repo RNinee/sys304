@@ -1,0 +1,6 @@
+node_modules
+data/*.sqlite
+data/*.sqlite-*
+data/retrain_state.json
+data/fake_labels.csv
+models/
